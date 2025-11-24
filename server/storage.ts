@@ -476,6 +476,13 @@ export class MemStorage implements IStorage {
         website: "https://www.whirlpool.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Infiniton",
+        supportEmail: "contacto@infiniton.pt",
+        supportPhone: "+34-958-087-169",
+        website: "https://infiniton.pt/",
+        category: "Eletrónicos",
+      },
     ];
 
     brands.forEach((brand) => {
