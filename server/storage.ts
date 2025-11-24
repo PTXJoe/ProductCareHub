@@ -9,6 +9,11 @@ import {
   type InsertSupportRequest,
   type ProductWithBrand,
   type ProductWithDetails,
+  type ServiceProvider,
+  type InsertServiceProvider,
+  type ServiceProviderReview,
+  type InsertServiceProviderReview,
+  type Notification,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -42,6 +47,25 @@ export interface IStorage {
   getAllSupportRequests(): Promise<SupportRequest[]>;
   createSupportRequest(request: InsertSupportRequest): Promise<SupportRequest>;
   updateSupportRequest(id: string, request: Partial<SupportRequest>): Promise<SupportRequest | undefined>;
+
+  // Service Providers
+  getServiceProvider(id: string): Promise<ServiceProvider | undefined>;
+  getAllServiceProviders(): Promise<ServiceProvider[]>;
+  getServiceProvidersByDistrict(district: string): Promise<ServiceProvider[]>;
+  createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider>;
+  updateServiceProvider(id: string, provider: Partial<ServiceProvider>): Promise<ServiceProvider | undefined>;
+  deleteServiceProvider(id: string): Promise<boolean>;
+
+  // Service Provider Reviews
+  getServiceProviderReviews(providerId: string): Promise<ServiceProviderReview[]>;
+  createServiceProviderReview(review: InsertServiceProviderReview): Promise<ServiceProviderReview>;
+  getAverageRating(providerId: string): Promise<number>;
+
+  // Notifications
+  getNotificationsByProduct(productId: string): Promise<Notification[]>;
+  createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification>;
+  getAllUnsentNotifications(): Promise<Notification[]>;
+  markNotificationAsSent(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -49,12 +73,18 @@ export class MemStorage implements IStorage {
   private products: Map<string, Product>;
   private reviews: Map<string, Review>;
   private supportRequests: Map<string, SupportRequest>;
+  private serviceProviders: Map<string, ServiceProvider>;
+  private serviceProviderReviews: Map<string, ServiceProviderReview>;
+  private notifications: Map<string, Notification>;
 
   constructor() {
     this.brands = new Map();
     this.products = new Map();
     this.reviews = new Map();
     this.supportRequests = new Map();
+    this.serviceProviders = new Map();
+    this.serviceProviderReviews = new Map();
+    this.notifications = new Map();
 
     // Seed with some popular brands
     this.seedBrands();
@@ -338,6 +368,117 @@ export class MemStorage implements IStorage {
     const updated = { ...request, ...updates };
     this.supportRequests.set(id, updated);
     return updated;
+  }
+
+  // Service Providers
+  async getServiceProvider(id: string): Promise<ServiceProvider | undefined> {
+    return this.serviceProviders.get(id);
+  }
+
+  async getAllServiceProviders(): Promise<ServiceProvider[]> {
+    return Array.from(this.serviceProviders.values())
+      .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+  }
+
+  async getServiceProvidersByDistrict(district: string): Promise<ServiceProvider[]> {
+    return Array.from(this.serviceProviders.values())
+      .filter(p => p.district.toLowerCase() === district.toLowerCase())
+      .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+  }
+
+  async createServiceProvider(insertProvider: InsertServiceProvider): Promise<ServiceProvider> {
+    const id = randomUUID();
+    const provider: ServiceProvider = {
+      ...insertProvider,
+      id,
+      supportedBrands: insertProvider.supportedBrands || [],
+      averageRating: 0,
+      createdAt: new Date(),
+    };
+    this.serviceProviders.set(id, provider);
+    return provider;
+  }
+
+  async updateServiceProvider(id: string, updates: Partial<ServiceProvider>): Promise<ServiceProvider | undefined> {
+    const provider = this.serviceProviders.get(id);
+    if (!provider) return undefined;
+
+    const updated = { ...provider, ...updates };
+    this.serviceProviders.set(id, updated);
+    return updated;
+  }
+
+  async deleteServiceProvider(id: string): Promise<boolean> {
+    // Delete reviews
+    const reviews = Array.from(this.serviceProviderReviews.values())
+      .filter(r => r.providerId === id);
+    reviews.forEach(r => this.serviceProviderReviews.delete(r.id));
+
+    return this.serviceProviders.delete(id);
+  }
+
+  // Service Provider Reviews
+  async getServiceProviderReviews(providerId: string): Promise<ServiceProviderReview[]> {
+    return Array.from(this.serviceProviderReviews.values())
+      .filter(r => r.providerId === providerId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async createServiceProviderReview(insertReview: InsertServiceProviderReview): Promise<ServiceProviderReview> {
+    const id = randomUUID();
+    const review: ServiceProviderReview = {
+      ...insertReview,
+      id,
+      createdAt: new Date(),
+    };
+    this.serviceProviderReviews.set(id, review);
+
+    // Update provider's average rating
+    const avgRating = await this.getAverageRating(insertReview.providerId);
+    await this.updateServiceProvider(insertReview.providerId, { averageRating: Math.round(avgRating) });
+
+    return review;
+  }
+
+  async getAverageRating(providerId: string): Promise<number> {
+    const reviews = await this.getServiceProviderReviews(providerId);
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return sum / reviews.length;
+  }
+
+  // Notifications
+  async getNotificationsByProduct(productId: string): Promise<Notification[]> {
+    return Array.from(this.notifications.values())
+      .filter(n => n.productId === productId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification> {
+    const id = randomUUID();
+    const newNotification: Notification = {
+      ...notification,
+      id,
+      createdAt: new Date(),
+    };
+    this.notifications.set(id, newNotification);
+    return newNotification;
+  }
+
+  async getAllUnsentNotifications(): Promise<Notification[]> {
+    return Array.from(this.notifications.values())
+      .filter(n => !n.sent)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+  async markNotificationAsSent(id: string): Promise<boolean> {
+    const notification = this.notifications.get(id);
+    if (!notification) return false;
+
+    notification.sent = true;
+    notification.sentAt = new Date();
+    this.notifications.set(id, notification);
+    return true;
   }
 }
 

@@ -144,10 +144,24 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type SupportRequest = typeof supportRequests.$inferSelect;
 export type InsertSupportRequest = z.infer<typeof insertSupportRequestSchema>;
 
+// Additional types
+export type ServiceProvider = typeof serviceProviders.$inferSelect;
+export type InsertServiceProvider = z.infer<typeof insertServiceProviderSchema>;
+
+export type ServiceProviderReview = typeof serviceProviderReviews.$inferSelect;
+export type InsertServiceProviderReview = z.infer<typeof insertServiceProviderReviewSchema>;
+
+export type Notification = typeof notifications.$inferSelect;
+
 // Extended types with relations
 export type ProductWithBrand = Product & { brand: Brand };
 export type ProductWithDetails = Product & {
   brand: Brand;
   reviews: Review[];
   supportRequests: SupportRequest[];
+};
+export type ServiceProviderWithBrands = ServiceProvider & { 
+  brands?: Brand[];
+  reviews?: ServiceProviderReview[];
+  averageRatingValue?: number;
 };
