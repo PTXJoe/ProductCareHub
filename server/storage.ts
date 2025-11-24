@@ -1208,9 +1208,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBrand(brand: InsertBrand): Promise<Brand> {
-    const id = randomUUID();
-    await db.insert(brands).values({ ...brand, id });
-    return (await this.getBrand(id))!;
+    const result = await db.insert(brands).values(brand).returning();
+    return result[0] as Brand;
   }
 
   async searchBrands(query: string): Promise<Brand[]> {
@@ -1262,9 +1261,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {
-    const id = randomUUID();
-    await db.insert(products).values({ ...product, id });
-    return (await this.getProduct(id))!;
+    const result = await db.insert(products).values(product).returning();
+    return result[0] as Product;
   }
 
   async updateProduct(id: string, product: Partial<Product>): Promise<Product | undefined> {
@@ -1292,9 +1290,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createReview(review: InsertReview): Promise<Review> {
-    const id = randomUUID();
-    await db.insert(reviews).values({ ...review, id });
-    return (await this.getReview(id))!;
+    const result = await db.insert(reviews).values(review).returning();
+    return result[0] as Review;
   }
 
   // Support Requests
@@ -1312,9 +1309,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSupportRequest(request: InsertSupportRequest): Promise<SupportRequest> {
-    const id = randomUUID();
-    await db.insert(supportRequests).values({ ...request, id });
-    return (await this.getSupportRequest(id))!;
+    const result = await db.insert(supportRequests).values(request).returning();
+    return result[0] as SupportRequest;
   }
 
   // Service Providers
@@ -1333,9 +1329,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
-    const id = randomUUID();
-    await db.insert(serviceProviders).values({ ...provider, id });
-    return (await this.getServiceProvider(id))!;
+    const result = await db.insert(serviceProviders).values(provider).returning();
+    return result[0] as ServiceProvider;
   }
 
   // Service Provider Reviews
@@ -1369,9 +1364,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Favorites
-  async toggleFavorite(type: 'product' | 'provider', targetId: string): Promise<Favorite> {
-    const id = randomUUID();
-    return { id, type, targetId };
+  async toggleFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean> {
+    return true;
   }
 
   async isFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean> {
@@ -1385,11 +1379,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveClientProfile(profile: InsertClientProfile): Promise<ClientProfile> {
-    const id = randomUUID();
-    const now = new Date();
-    const prof = { ...profile, id, createdAt: now, updatedAt: now };
-    await db.insert(clientProfile).values(prof);
-    return prof as ClientProfile;
+    const result = await db.insert(clientProfile).values(profile).returning();
+    return result[0] as ClientProfile;
   }
 
   async updateClientProfile(profile: Partial<ClientProfile>): Promise<ClientProfile | undefined> {
