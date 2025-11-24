@@ -483,6 +483,13 @@ export class MemStorage implements IStorage {
         website: "https://infiniton.pt/",
         category: "Eletrónicos",
       },
+      {
+        name: "Jocca",
+        supportEmail: "atencionalcliente@jocca.es",
+        supportPhone: "+34-976-472-047",
+        website: "https://www.joccashop.com/pt/",
+        category: "Eletrónicos",
+      },
     ];
 
     brands.forEach((brand) => {
