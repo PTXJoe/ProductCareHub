@@ -357,6 +357,13 @@ export class MemStorage implements IStorage {
         website: "https://www.atinformatica.pt/",
         category: "Computadores",
       },
+      {
+        name: "Fagor",
+        supportEmail: "contacto@fagorelectrodomestico.com",
+        supportPhone: "+351-707-502-207",
+        website: "https://www.fagorelectrodomestico.pt/contactos",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
