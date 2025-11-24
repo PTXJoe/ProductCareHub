@@ -1180,4 +1180,225 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0] as User | undefined;
+  }
+
+  async upsertUser(user: UpsertUser): Promise<User> {
+    const existing = await this.getUser(user.id);
+    if (existing) {
+      await db.update(users).set(user).where(eq(users.id, user.id));
+      return (await this.getUser(user.id))!;
+    }
+    await db.insert(users).values(user);
+    return (await this.getUser(user.id))!;
+  }
+
+  // Brands
+  async getBrand(id: string): Promise<Brand | undefined> {
+    const result = await db.select().from(brands).where(eq(brands.id, id));
+    return result[0] as Brand | undefined;
+  }
+
+  async getAllBrands(): Promise<Brand[]> {
+    return await db.select().from(brands);
+  }
+
+  async createBrand(brand: InsertBrand): Promise<Brand> {
+    const id = randomUUID();
+    await db.insert(brands).values({ ...brand, id });
+    return (await this.getBrand(id))!;
+  }
+
+  async searchBrands(query: string): Promise<Brand[]> {
+    return await db.select().from(brands)
+      .where(like(brands.name, `%${query}%`));
+  }
+
+  // Products
+  async getProduct(id: string): Promise<Product | undefined> {
+    const result = await db.select().from(products).where(eq(products.id, id));
+    return result[0] as Product | undefined;
+  }
+
+  async getProductWithBrand(id: string): Promise<ProductWithBrand | undefined> {
+    const result = await db.select().from(products)
+      .innerJoin(brands, eq(products.brandId, brands.id))
+      .where(eq(products.id, id));
+    if (!result[0]) return undefined;
+    const { products: p, brands: b } = result[0];
+    return { ...p, brand: b } as ProductWithBrand;
+  }
+
+  async getProductWithDetails(id: string): Promise<ProductWithDetails | undefined> {
+    const product = await this.getProductWithBrand(id);
+    if (!product) return undefined;
+    const revs = await this.getReviewsByProduct(id);
+    const reqs = await this.getSupportRequestsByProduct(id);
+    return { ...product, reviews: revs, supportRequests: reqs } as ProductWithDetails;
+  }
+
+  async getAllProducts(): Promise<ProductWithBrand[]> {
+    const results = await db.select().from(products)
+      .innerJoin(brands, eq(products.brandId, brands.id));
+    return results.map(({ products: p, brands: b }) => ({ ...p, brand: b }) as ProductWithBrand);
+  }
+
+  async getProductsByBrand(brandId: string): Promise<ProductWithBrand[]> {
+    const results = await db.select().from(products)
+      .innerJoin(brands, eq(products.brandId, brands.id))
+      .where(eq(products.brandId, brandId));
+    return results.map(({ products: p, brands: b }) => ({ ...p, brand: b }) as ProductWithBrand);
+  }
+
+  async searchProducts(query: string): Promise<ProductWithBrand[]> {
+    const results = await db.select().from(products)
+      .innerJoin(brands, eq(products.brandId, brands.id))
+      .where(like(products.name, `%${query}%`));
+    return results.map(({ products: p, brands: b }) => ({ ...p, brand: b }) as ProductWithBrand);
+  }
+
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const id = randomUUID();
+    await db.insert(products).values({ ...product, id });
+    return (await this.getProduct(id))!;
+  }
+
+  async updateProduct(id: string, product: Partial<Product>): Promise<Product | undefined> {
+    await db.update(products).set(product).where(eq(products.id, id));
+    return await this.getProduct(id);
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await db.delete(products).where(eq(products.id, id));
+    return true;
+  }
+
+  // Reviews
+  async getReview(id: string): Promise<Review | undefined> {
+    const result = await db.select().from(reviews).where(eq(reviews.id, id));
+    return result[0] as Review | undefined;
+  }
+
+  async getReviewsByProduct(productId: string): Promise<Review[]> {
+    return await db.select().from(reviews).where(eq(reviews.productId, productId));
+  }
+
+  async getAllReviews(): Promise<Review[]> {
+    return await db.select().from(reviews);
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const id = randomUUID();
+    await db.insert(reviews).values({ ...review, id });
+    return (await this.getReview(id))!;
+  }
+
+  // Support Requests
+  async getSupportRequest(id: string): Promise<SupportRequest | undefined> {
+    const result = await db.select().from(supportRequests).where(eq(supportRequests.id, id));
+    return result[0] as SupportRequest | undefined;
+  }
+
+  async getSupportRequestsByProduct(productId: string): Promise<SupportRequest[]> {
+    return await db.select().from(supportRequests).where(eq(supportRequests.productId, productId));
+  }
+
+  async getAllSupportRequests(): Promise<SupportRequest[]> {
+    return await db.select().from(supportRequests);
+  }
+
+  async createSupportRequest(request: InsertSupportRequest): Promise<SupportRequest> {
+    const id = randomUUID();
+    await db.insert(supportRequests).values({ ...request, id });
+    return (await this.getSupportRequest(id))!;
+  }
+
+  // Service Providers
+  async getServiceProvider(id: string): Promise<ServiceProvider | undefined> {
+    const result = await db.select().from(serviceProviders).where(eq(serviceProviders.id, id));
+    return result[0] as ServiceProvider | undefined;
+  }
+
+  async getAllServiceProviders(): Promise<ServiceProvider[]> {
+    return await db.select().from(serviceProviders);
+  }
+
+  async searchServiceProviders(query: string): Promise<ServiceProvider[]> {
+    return await db.select().from(serviceProviders)
+      .where(like(serviceProviders.name, `%${query}%`));
+  }
+
+  async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
+    const id = randomUUID();
+    await db.insert(serviceProviders).values({ ...provider, id });
+    return (await this.getServiceProvider(id))!;
+  }
+
+  // Service Provider Reviews
+  async getServiceProviderReview(id: string): Promise<ServiceProviderReview | undefined> {
+    const result = await db.select().from(serviceProviders).where(eq(serviceProviders.id, id));
+    return result[0] as ServiceProviderReview | undefined;
+  }
+
+  async getServiceProviderReviewsByProvider(providerId: string): Promise<ServiceProviderReview[]> {
+    const result = await db.select().from(serviceProviders).where(eq(serviceProviders.id, providerId));
+    return [];
+  }
+
+  async createServiceProviderReview(review: InsertServiceProviderReview): Promise<ServiceProviderReview> {
+    return review as ServiceProviderReview;
+  }
+
+  // Notifications
+  async getNotification(id: string): Promise<Notification | undefined> {
+    return undefined;
+  }
+
+  async getAllNotifications(): Promise<Notification[]> {
+    return [];
+  }
+
+  async createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification> {
+    const id = randomUUID();
+    const notif: Notification = { ...notification, id, createdAt: new Date() };
+    return notif;
+  }
+
+  // Favorites
+  async toggleFavorite(type: 'product' | 'provider', targetId: string): Promise<Favorite> {
+    const id = randomUUID();
+    return { id, type, targetId };
+  }
+
+  async isFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean> {
+    return false;
+  }
+
+  // Client Profile
+  async getClientProfile(): Promise<ClientProfile | undefined> {
+    const result = await db.select().from(clientProfile);
+    return result[0] as ClientProfile | undefined;
+  }
+
+  async saveClientProfile(profile: InsertClientProfile): Promise<ClientProfile> {
+    const id = randomUUID();
+    const now = new Date();
+    const prof = { ...profile, id, createdAt: now, updatedAt: now };
+    await db.insert(clientProfile).values(prof);
+    return prof as ClientProfile;
+  }
+
+  async updateClientProfile(profile: Partial<ClientProfile>): Promise<ClientProfile | undefined> {
+    const current = await this.getClientProfile();
+    if (!current) return undefined;
+    const updated = { ...current, ...profile, updatedAt: new Date() };
+    await db.update(clientProfile).set(updated);
+    return updated as ClientProfile;
+  }
+}
+
+export const storage = new DatabaseStorage();
