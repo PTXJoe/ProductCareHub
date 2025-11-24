@@ -27,6 +27,7 @@ const STEPS = [
   { id: 2, title: "Detalhes", description: "Informação do produto" },
   { id: 3, title: "Talão", description: "Upload da fatura" },
   { id: 4, title: "Fotos", description: "Imagens do produto" },
+  { id: 5, title: "Confirmar", description: "Reveja os dados" },
 ];
 
 export default function RegisterProduct() {
@@ -417,6 +418,56 @@ export default function RegisterProduct() {
                   <p className="text-xs text-muted-foreground">Máximo 5 fotos</p>
                 </div>
               )}
+
+              {currentStep === 5 && (
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Reveja os Dados do Produto</h2>
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4 space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Marca</label>
+                        <p className="text-base" data-testid="text-review-brand">{brands?.find((b: any) => b.id === form.watch("brandId"))?.name || "N/A"}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Nome do Produto</label>
+                        <p className="text-base" data-testid="text-review-name">{form.watch("name")}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Modelo</label>
+                        <p className="text-base" data-testid="text-review-model">{form.watch("model")}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Categoria</label>
+                        <p className="text-base" data-testid="text-review-category">{form.watch("category")}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Data de Compra</label>
+                        <p className="text-base" data-testid="text-review-date">{form.watch("purchaseDate")}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Loja</label>
+                        <p className="text-base" data-testid="text-review-store">{form.watch("store") || "Não preenchido"}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Número de Série</label>
+                        <p className="text-base" data-testid="text-review-serial">{form.watch("serialNumber") || "Não preenchido"}</p>
+                      </div>
+                      {receiptFile && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Talão</label>
+                          <p className="text-base text-green-600" data-testid="text-review-receipt">✓ Talão enviado</p>
+                        </div>
+                      )}
+                      {photoFiles.length > 0 && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Fotos</label>
+                          <p className="text-base text-green-600" data-testid="text-review-photos">✓ {photoFiles.length} foto(s) enviada(s)</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </Card>
 
             {/* Navigation Buttons */}
@@ -427,7 +478,7 @@ export default function RegisterProduct() {
                   Anterior
                 </Button>
               )}
-              {currentStep < STEPS.length ? (
+              {currentStep !== STEPS.length ? (
                 <Button type="button" onClick={nextStep} className="ml-auto" data-testid="button-next">
                   Próximo
                   <ArrowRight className="h-4 w-4 ml-2" />
