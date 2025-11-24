@@ -259,6 +259,20 @@ export class MemStorage implements IStorage {
         website: "https://www.confortec.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Telefac",
+        supportEmail: "geral@liana.com.pt",
+        supportPhone: "+351-214-250-300",
+        website: "https://www.telefac.pt/",
+        category: "Eletrodomésticos",
+      },
+      {
+        name: "Newpool",
+        supportEmail: "geral@liana.com.pt",
+        supportPhone: "+351-214-250-350",
+        website: "https://www.newpool.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
