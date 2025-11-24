@@ -331,8 +331,8 @@ export class MemStorage implements IStorage {
       },
       {
         name: "Ufesa",
-        supportEmail: "contacto@ufesa.es",
-        supportPhone: "+34-936-008-800",
+        supportEmail: "servicosat@ufesa.pt",
+        supportPhone: "+351-214-250-750",
         website: "https://www.ufesa.es/?lang=pt-pt",
         category: "Eletrodomésticos",
       },
