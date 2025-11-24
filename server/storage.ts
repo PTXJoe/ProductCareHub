@@ -280,6 +280,13 @@ export class MemStorage implements IStorage {
         website: "https://www.cata.com/pt-es/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Casio",
+        supportEmail: "margaridadias@casio.pt",
+        supportPhone: "+351-210-304-200",
+        website: "https://www.casio-europe.com/pt/",
+        category: "Eletrónicos",
+      },
     ];
 
     brands.forEach((brand) => {
