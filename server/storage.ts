@@ -217,6 +217,13 @@ export class MemStorage implements IStorage {
         website: "https://www.avenzo.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Beko",
+        supportEmail: "servico.clientes@beko.pt",
+        supportPhone: "+351-214-250-650",
+        website: "https://www.beko.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
