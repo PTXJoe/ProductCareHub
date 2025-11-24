@@ -336,6 +336,13 @@ export class MemStorage implements IStorage {
         website: "https://www.ufesa.es/?lang=pt-pt",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Epson",
+        supportEmail: "apoio_clientes@epson.pt",
+        supportPhone: "+351-707-222-000",
+        website: "https://www.epson.pt/pt_PT/support",
+        category: "Impressoras e Periféricos",
+      },
     ];
 
     brands.forEach((brand) => {
