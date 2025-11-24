@@ -4,6 +4,7 @@ import multer from "multer";
 import path from "path";
 import PDFDocument from "pdfkit";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertBrandSchema, insertProductSchema, insertReviewSchema, insertSupportRequestSchema, insertServiceProviderSchema, insertServiceProviderReviewSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 

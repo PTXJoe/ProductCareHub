@@ -17,10 +17,15 @@ import {
   type Favorite,
   type ClientProfile,
   type InsertClientProfile,
+  type User,
+  type UpsertUser,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
+  // User operations
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   // Brands
   getBrand(id: string): Promise<Brand | undefined>;
   getAllBrands(): Promise<Brand[]>;
@@ -91,6 +96,12 @@ export interface IStorage {
   updateClientProfile(profile: Partial<ClientProfile>): Promise<ClientProfile | undefined>;
 }
 
+// For development/testing
+export interface UserForStorage extends User {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export class MemStorage implements IStorage {
   private brands: Map<string, Brand>;
   private products: Map<string, Product>;
@@ -101,6 +112,7 @@ export class MemStorage implements IStorage {
   private notifications: Map<string, Notification>;
   private favorites: Map<string, Favorite>;
   private clientProfile: ClientProfile | null;
+  private users: Map<string, UserForStorage>;
 
   constructor() {
     this.brands = new Map();
@@ -112,9 +124,37 @@ export class MemStorage implements IStorage {
     this.notifications = new Map();
     this.favorites = new Map();
     this.clientProfile = null;
+    this.users = new Map();
 
     // Seed with some popular brands
     this.seedBrands();
+  }
+
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    const { createdAt, updatedAt, ...rest } = user;
+    return rest;
+  }
+
+  async upsertUser(user: UpsertUser): Promise<User> {
+    const now = new Date();
+    const existing = this.users.get(user.id);
+    
+    const userForStorage: UserForStorage = {
+      ...user,
+      email: user.email || null,
+      firstName: user.firstName || null,
+      lastName: user.lastName || null,
+      profileImageUrl: user.profileImageUrl || null,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now,
+    };
+    
+    this.users.set(user.id, userForStorage);
+    const { createdAt, updatedAt, ...rest } = userForStorage;
+    return rest as User;
   }
 
   private seedBrands() {
