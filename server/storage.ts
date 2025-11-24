@@ -497,6 +497,13 @@ export class MemStorage implements IStorage {
         website: "https://www.kenwoodworld.com/pt-pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "LG",
+        supportEmail: "pt.cic@lge.com",
+        supportPhone: "+351-300-600-033",
+        website: "https://www.lg.com/pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
