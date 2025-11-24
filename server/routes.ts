@@ -208,6 +208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           serialNumber: req.body.serialNumber || null,
           category: req.body.category,
           purchaseDate: new Date(req.body.purchaseDate),
+          store: req.body.store || null,
           notes: req.body.notes || null,
           receiptUrl,
           photoUrls,

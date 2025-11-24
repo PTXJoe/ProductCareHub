@@ -51,6 +51,7 @@ export default function RegisterProduct() {
       serialNumber: "",
       category: "",
       purchaseDate: "",
+      store: "",
       notes: "",
     },
   });
@@ -286,6 +287,19 @@ export default function RegisterProduct() {
                             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input type="date" className="pl-10" {...field} data-testid="input-purchase-date" />
                           </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="store"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Loja (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Fnac, Worten, Amazon" {...field} data-testid="input-store" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
