@@ -287,6 +287,13 @@ export class MemStorage implements IStorage {
         website: "https://www.casio-europe.com/pt/",
         category: "Eletrónicos",
       },
+      {
+        name: "Crown",
+        supportEmail: "spv.crowneurope@gmail.com",
+        supportPhone: "+351-214-250-200",
+        website: "https://www.crown.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
