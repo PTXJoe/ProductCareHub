@@ -364,6 +364,13 @@ export class MemStorage implements IStorage {
         website: "https://www.fagorelectrodomestico.pt/contactos",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Electrolux",
+        supportEmail: "electrolux.service@electrolux.pt",
+        supportPhone: "+351-308-813-383",
+        website: "https://www.electrolux.pt/support/contact-us/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
