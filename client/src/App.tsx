@@ -6,8 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Package, Users, History, BarChart3, Shield, UserCircle } from "lucide-react";
+import { Package, Users, History, BarChart3, Shield, UserCircle, LogOut } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import RegisterProduct from "@/pages/register-product";
@@ -25,6 +26,40 @@ import InsuranceExtensions from "@/pages/insurance-extensions";
 import ClientProfile from "@/pages/client-profile";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Package className="h-12 w-12 mx-auto mb-4 text-primary" />
+          <p className="text-lg text-muted-foreground">A carregar...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center space-y-6">
+          <div className="p-4 rounded-lg bg-primary text-primary-foreground inline-block">
+            <Package className="h-12 w-12" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Warranty Manager</h1>
+            <p className="text-muted-foreground mb-6">Gerencie suas garantias com facilidade</p>
+          </div>
+          <a href="/api/login">
+            <Button size="lg" data-testid="button-login">
+              Entrar com Google
+            </Button>
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
@@ -48,12 +83,17 @@ function Router() {
 
 function Navigation() {
   const [location] = useLocation();
+  const { isAuthenticated } = useAuth();
   
   const isActive = (path: string) => {
     if (path === "/" && location === "/") return true;
     if (path !== "/" && location.startsWith(path)) return true;
     return false;
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -154,6 +194,15 @@ function Navigation() {
               <UserCircle className="h-5 w-5" />
             </Button>
           </Link>
+          <a href="/api/logout">
+            <Button
+              variant="ghost"
+              size="icon"
+              data-testid="button-logout"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </a>
           <ThemeToggle />
         </div>
       </div>
