@@ -399,6 +399,13 @@ export class MemStorage implements IStorage {
         website: "https://www.flama.pt",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Fujitsu",
+        supportEmail: "portugal.helpdesk@ts.fujitsu.com",
+        supportPhone: "+351-217-244-400",
+        website: "https://www.fujitsu.com/pt/",
+        category: "Computadores",
+      },
     ];
 
     brands.forEach((brand) => {
