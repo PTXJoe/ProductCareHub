@@ -514,6 +514,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ANALYTICS ROUTE
+  app.get("/api/analytics", async (req, res) => {
+    try {
+      const products = await storage.getAllProducts();
+      const providers = await storage.getAllServiceProviders();
+      const allReviews = await storage.getAllReviews();
+
+      // Calculate top brands
+      const brandCounts: { [key: string]: { name: string; count: number; id: string } } = {};
+      products.forEach(p => {
+        if (!brandCounts[p.brandId]) {
+          brandCounts[p.brandId] = { name: p.brand.name, count: 0, id: p.brandId };
+        }
+        brandCounts[p.brandId].count++;
+      });
+
+      // Calculate top rated providers
+      const providerRatings: { [key: string]: { name: string; ratings: number[]; id: string } } = {};
+      providers.forEach(p => {
+        providerRatings[p.id] = { name: p.name, ratings: [], id: p.id };
+      });
+
+      // Calculate stats
+      const stats = {
+        totalProducts: products.length,
+        totalProviders: providers.length,
+        avgWarrantyExpiration: Math.round(
+          products.reduce((sum, p) => {
+            const days = Math.ceil(
+              (new Date(p.warrantyExpiration).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+            );
+            return sum + Math.max(days, 0);
+          }, 0) / (products.length || 1)
+        ),
+      };
+
+      res.json({
+        topBrands: Object.values(brandCounts)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5),
+        topRatedProviders: providers
+          .map(p => ({
+            id: p.id,
+            name: p.name,
+            rating: p.averageRating || 0,
+            reviewCount: 0,
+          }))
+          .sort((a, b) => b.rating - a.rating)
+          .slice(0, 5),
+        stats,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  // FAVORITES ROUTES
+  app.get("/api/favorites/:type", async (req, res) => {
+    try {
+      const type = req.params.type as 'product' | 'provider';
+      const favorites = type === 'product' 
+        ? await storage.getFavoriteProducts()
+        : await storage.getFavoriteProviders();
+      res.json(favorites);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch favorites" });
+    }
+  });
+
+  app.post("/api/favorites/:type/:id/toggle", async (req, res) => {
+    try {
+      const type = req.params.type as 'product' | 'provider';
+      const isFav = await storage.toggleFavorite(type, req.params.id);
+      res.json({ favorite: isFav });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to toggle favorite" });
+    }
+  });
+
+  app.get("/api/favorites/check/:type/:id", async (req, res) => {
+    try {
+      const type = req.params.type as 'product' | 'provider';
+      const isFav = await storage.isFavorite(type, req.params.id);
+      res.json({ isFavorite: isFav });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check favorite" });
+    }
+  });
+
+  // WARRANTY CERTIFICATE PDF
+  app.get("/api/products/:id/certificate/pdf", async (req, res) => {
+    try {
+      const product = await storage.getProductWithBrand(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      const warrantyExpiration = new Date(product.warrantyExpiration);
+      const daysRemaining = Math.ceil(
+        (warrantyExpiration.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+      );
+      const isExpired = daysRemaining < 0;
+
+      const doc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="warranty-${product.id}.pdf"`
+      );
+
+      doc.pipe(res);
+
+      doc.fontSize(24).font("Helvetica-Bold").text("CERTIFICADO DE GARANTIA", { align: "center" });
+      doc.fontSize(12).text("WARRANTY CERTIFICATE", { align: "center" });
+      doc.moveDown();
+
+      doc.fontSize(11).font("Helvetica-Bold").text("INFORMAÇÃO DO PRODUTO");
+      doc.fontSize(10).font("Helvetica");
+      doc.text(`Produto: ${product.name}`);
+      doc.text(`Marca: ${product.brand.name}`);
+      doc.text(`Modelo: ${product.model}`);
+      doc.text(`Série: ${product.serialNumber || "N/A"}`);
+      doc.moveDown();
+
+      doc.fontSize(11).font("Helvetica-Bold").text("GARANTIA");
+      doc.fontSize(10).font("Helvetica");
+      doc.text(`Data de Compra: ${new Date(product.purchaseDate).toLocaleDateString("pt-PT")}`);
+      doc.text(`Expiração: ${warrantyExpiration.toLocaleDateString("pt-PT")}`);
+      doc.text(`Status: ${isExpired ? "EXPIRADA" : "VÁLIDA"}`);
+      if (!isExpired) {
+        doc.text(`Dias Restantes: ${Math.max(daysRemaining, 0)}`);
+      }
+      doc.moveDown();
+
+      doc.fontSize(11).font("Helvetica-Bold").text("CONTACTO FABRICANTE");
+      doc.fontSize(10).font("Helvetica");
+      doc.text(`Email: ${product.brand.supportEmail}`);
+      if (product.brand.supportPhone) doc.text(`Telefone: ${product.brand.supportPhone}`);
+
+      doc.end();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate certificate" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

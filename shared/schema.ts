@@ -88,6 +88,14 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+// Favorites table - users can favorite products and service providers
+export const favorites = pgTable("favorites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(), // 'product' or 'provider'
+  targetId: varchar("target_id").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 // Insert schemas with validation
 export const insertBrandSchema = createInsertSchema(brands).omit({
   id: true,
@@ -152,6 +160,8 @@ export type ServiceProviderReview = typeof serviceProviderReviews.$inferSelect;
 export type InsertServiceProviderReview = z.infer<typeof insertServiceProviderReviewSchema>;
 
 export type Notification = typeof notifications.$inferSelect;
+
+export type Favorite = typeof favorites.$inferSelect;
 
 // Extended types with relations
 export type ProductWithBrand = Product & { brand: Brand };

@@ -14,6 +14,7 @@ import {
   type ServiceProviderReview,
   type InsertServiceProviderReview,
   type Notification,
+  type Favorite,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -66,6 +67,12 @@ export interface IStorage {
   createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification>;
   getAllUnsentNotifications(): Promise<Notification[]>;
   markNotificationAsSent(id: string): Promise<boolean>;
+
+  // Favorites
+  getFavoriteProducts(): Promise<string[]>;
+  getFavoriteProviders(): Promise<string[]>;
+  toggleFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean>;
+  isFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -76,6 +83,7 @@ export class MemStorage implements IStorage {
   private serviceProviders: Map<string, ServiceProvider>;
   private serviceProviderReviews: Map<string, ServiceProviderReview>;
   private notifications: Map<string, Notification>;
+  private favorites: Map<string, Favorite>;
 
   constructor() {
     this.brands = new Map();
@@ -85,6 +93,7 @@ export class MemStorage implements IStorage {
     this.serviceProviders = new Map();
     this.serviceProviderReviews = new Map();
     this.notifications = new Map();
+    this.favorites = new Map();
 
     // Seed with some popular brands
     this.seedBrands();
@@ -479,6 +488,53 @@ export class MemStorage implements IStorage {
     notification.sentAt = new Date();
     this.notifications.set(id, notification);
     return true;
+  }
+
+  // Favorites
+  async getFavoriteProducts(): Promise<string[]> {
+    return Array.from(this.favorites.values())
+      .filter(f => f.type === 'product')
+      .map(f => f.targetId);
+  }
+
+  async getFavoriteProviders(): Promise<string[]> {
+    return Array.from(this.favorites.values())
+      .filter(f => f.type === 'provider')
+      .map(f => f.targetId);
+  }
+
+  async toggleFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean> {
+    const key = `${type}-${targetId}`;
+    const exists = Array.from(this.favorites.values()).some(
+      f => f.type === type && f.targetId === targetId
+    );
+
+    if (exists) {
+      // Remove favorite
+      const toDelete = Array.from(this.favorites.entries()).find(
+        ([_, f]) => f.type === type && f.targetId === targetId
+      );
+      if (toDelete) {
+        this.favorites.delete(toDelete[0]);
+      }
+      return false;
+    } else {
+      // Add favorite
+      const id = randomUUID();
+      this.favorites.set(id, {
+        id,
+        type,
+        targetId,
+        createdAt: new Date(),
+      });
+      return true;
+    }
+  }
+
+  async isFavorite(type: 'product' | 'provider', targetId: string): Promise<boolean> {
+    return Array.from(this.favorites.values()).some(
+      f => f.type === type && f.targetId === targetId
+    );
   }
 }
 

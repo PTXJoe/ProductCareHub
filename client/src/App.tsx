@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Package, Users, History, Plus } from "lucide-react";
+import { Package, Users, History, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
@@ -19,6 +19,8 @@ import SupportHistory from "@/pages/support-history";
 import CreateBrand from "@/pages/create-brand";
 import ServiceProviders from "@/pages/service-providers";
 import RegisterProvider from "@/pages/register-provider";
+import Analytics from "@/pages/analytics";
+import WarrantyCertificate from "@/pages/warranty-certificate";
 
 function Router() {
   return (
@@ -33,6 +35,8 @@ function Router() {
       <Route path="/historico-reclamacoes" component={SupportHistory} />
       <Route path="/provedores" component={ServiceProviders} />
       <Route path="/provedores/registar" component={RegisterProvider} />
+      <Route path="/analytics" component={Analytics} />
+      <Route path="/certificado/:id" component={WarrantyCertificate} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -111,6 +115,16 @@ function Navigation() {
               >
                 <Users className="h-4 w-4 mr-2" />
                 Provedores
+              </Button>
+            </Link>
+            <Link href="/analytics">
+              <Button
+                variant={isActive("/analytics") ? "secondary" : "ghost"}
+                size="sm"
+                data-testid="nav-analytics"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
               </Button>
             </Link>
           </nav>
