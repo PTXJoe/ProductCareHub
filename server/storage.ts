@@ -434,6 +434,13 @@ export class MemStorage implements IStorage {
         website: "https://grunkel.com",
         category: "Eletrónicos",
       },
+      {
+        name: "Hisense",
+        supportEmail: "atencaoaocliente@hisenseiberia.com",
+        supportPhone: "+351-800-181-818",
+        website: "https://www.hisense.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
