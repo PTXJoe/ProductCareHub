@@ -308,6 +308,13 @@ export class MemStorage implements IStorage {
         website: "https://www.cecotec.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Delta",
+        supportEmail: "clientes.retail@mydeltaq.com",
+        supportPhone: "+351-214-250-050",
+        website: "https://www.delta.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
