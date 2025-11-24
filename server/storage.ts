@@ -329,6 +329,13 @@ export class MemStorage implements IStorage {
         website: "https://www.daitsu.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Ufesa",
+        supportEmail: "contacto@ufesa.es",
+        supportPhone: "+34-936-008-800",
+        website: "https://www.ufesa.es/?lang=pt-pt",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
