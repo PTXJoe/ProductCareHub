@@ -406,6 +406,13 @@ export class MemStorage implements IStorage {
         website: "https://www.fujitsu.com/pt/",
         category: "Computadores",
       },
+      {
+        name: "Growing",
+        supportEmail: "geral@grow.com.pt",
+        supportPhone: "+351-211-303-000",
+        website: "https://www.grow.com.pt/",
+        category: "Equipamentos Industriais",
+      },
     ];
 
     brands.forEach((brand) => {
