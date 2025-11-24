@@ -275,7 +275,7 @@ export class MemStorage implements IStorage {
       },
       {
         name: "Cata",
-        supportEmail: "info@cnagroup.es",
+        supportEmail: "junis@junis.pt",
         supportPhone: "+34-938-521-818",
         website: "https://www.cata.com/pt-es/",
         category: "Eletrodomésticos",
