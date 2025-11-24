@@ -54,8 +54,22 @@ export default function SupportRequest() {
     },
   });
 
-  const onSubmit = (data: any) => {
-    sendSupportRequest.mutate(data);
+  const onSubmit = () => {
+    const formValues = form.getValues();
+    console.log("Form values:", formValues);
+    console.log("Form errors:", form.formState.errors);
+    
+    // Validate required fields
+    if (!formValues.productId || !formValues.issueDescription || !formValues.category || !formValues.severity) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    sendSupportRequest.mutate(formValues);
   };
 
   if (!product) {
@@ -99,7 +113,7 @@ export default function SupportRequest() {
 
         {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-6">
             <Card className="p-6 space-y-6">
               <div>
                 <h2 className="text-xl font-semibold mb-4">Descrição do Problema</h2>
