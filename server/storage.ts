@@ -15,6 +15,8 @@ import {
   type InsertServiceProviderReview,
   type Notification,
   type Favorite,
+  type ClientProfile,
+  type InsertClientProfile,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -82,6 +84,11 @@ export interface IStorage {
     policyNumber: string;
     extensionCost?: number;
   }): Promise<Product | undefined>;
+
+  // Client Profile
+  getClientProfile(): Promise<ClientProfile | undefined>;
+  saveClientProfile(profile: InsertClientProfile): Promise<ClientProfile>;
+  updateClientProfile(profile: Partial<ClientProfile>): Promise<ClientProfile | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -93,6 +100,7 @@ export class MemStorage implements IStorage {
   private serviceProviderReviews: Map<string, ServiceProviderReview>;
   private notifications: Map<string, Notification>;
   private favorites: Map<string, Favorite>;
+  private clientProfile: ClientProfile | null;
 
   constructor() {
     this.brands = new Map();
@@ -103,6 +111,7 @@ export class MemStorage implements IStorage {
     this.serviceProviderReviews = new Map();
     this.notifications = new Map();
     this.favorites = new Map();
+    this.clientProfile = null;
 
     // Seed with some popular brands
     this.seedBrands();
@@ -571,6 +580,36 @@ export class MemStorage implements IStorage {
     return Array.from(this.favorites.values()).some(
       f => f.type === type && f.targetId === targetId
     );
+  }
+
+  // Client Profile
+  async getClientProfile(): Promise<ClientProfile | undefined> {
+    return this.clientProfile || undefined;
+  }
+
+  async saveClientProfile(profile: InsertClientProfile): Promise<ClientProfile> {
+    const id = randomUUID();
+    const now = new Date();
+    const clientProf: ClientProfile = {
+      ...profile,
+      id,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.clientProfile = clientProf;
+    return clientProf;
+  }
+
+  async updateClientProfile(profile: Partial<ClientProfile>): Promise<ClientProfile | undefined> {
+    if (!this.clientProfile) return undefined;
+    
+    const updated: ClientProfile = {
+      ...this.clientProfile,
+      ...profile,
+      updatedAt: new Date(),
+    };
+    this.clientProfile = updated;
+    return updated;
   }
 }
 

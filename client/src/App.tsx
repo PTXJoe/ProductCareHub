@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Package, Users, History, BarChart3, Shield } from "lucide-react";
+import { Package, Users, History, BarChart3, Shield, UserCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
@@ -22,6 +22,7 @@ import RegisterProvider from "@/pages/register-provider";
 import Analytics from "@/pages/analytics";
 import WarrantyCertificate from "@/pages/warranty-certificate";
 import InsuranceExtensions from "@/pages/insurance-extensions";
+import ClientProfile from "@/pages/client-profile";
 
 function Router() {
   return (
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/analytics" component={Analytics} />
       <Route path="/certificado/:id" component={WarrantyCertificate} />
       <Route path="/extensoes-garantia" component={InsuranceExtensions} />
+      <Route path="/perfil" component={ClientProfile} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -142,7 +144,16 @@ function Navigation() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <Link href="/perfil">
+            <Button
+              variant={isActive("/perfil") ? "secondary" : "ghost"}
+              size="icon"
+              data-testid="button-profile"
+            >
+              <UserCircle className="h-5 w-5" />
+            </Button>
+          </Link>
           <ThemeToggle />
         </div>
       </div>

@@ -32,12 +32,14 @@ const upload = multer({
 });
 
 // Helper function to generate warranty claim email content
-function generateWarrantyEmail(product: any, brand: any, issue: any) {
+async function generateWarrantyEmail(product: any, brand: any, issue: any) {
   const purchaseDate = new Date(product.purchaseDate).toLocaleDateString('pt-PT', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+
+  const clientProfile = await storage.getClientProfile();
 
   return {
     to: brand.supportEmail,
@@ -47,6 +49,14 @@ Exmo(a) Senhor(a),
 
 Venho por este meio solicitar assistência técnica para o seguinte produto:
 
+DADOS DO CLIENTE:
+${clientProfile ? `- Nome: ${clientProfile.fullName}
+- Email: ${clientProfile.email}
+- Contacto: ${clientProfile.phoneNumber}
+- NIF/Contribuinte: ${clientProfile.taxNumber || 'N/A'}
+- Morada: ${clientProfile.address}, ${clientProfile.city} ${clientProfile.postalCode || ''}
+
+` : ''}
 INFORMAÇÃO DO PRODUTO:
 - Produto: ${product.name}
 - Marca: ${brand.name}
@@ -65,7 +75,7 @@ ${product.receiptUrl ? '\nAnexo: Talão de compra em anexo' : ''}
 Agradeço a vossa atenção e aguardo retorno.
 
 Com os melhores cumprimentos,
-[Cliente Warranty Manager]
+${clientProfile ? clientProfile.fullName : '[Cliente Warranty Manager]'}
     `.trim(),
   };
 }
@@ -600,6 +610,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ isFavorite: isFav });
     } catch (error) {
       res.status(500).json({ error: "Failed to check favorite" });
+    }
+  });
+
+  // CLIENT PROFILE ROUTES
+  app.get("/api/profile", async (req, res) => {
+    try {
+      const profile = await storage.getClientProfile();
+      res.json(profile || {});
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
+  app.post("/api/profile", async (req, res) => {
+    try {
+      const profile = await storage.saveClientProfile(req.body);
+      res.json(profile);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save profile" });
     }
   });
 

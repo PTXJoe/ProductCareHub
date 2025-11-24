@@ -103,6 +103,20 @@ export const favorites = pgTable("favorites", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+// Client profile table - user's personal information for support requests
+export const clientProfile = pgTable("client_profile", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phoneNumber: text("phone_number").notNull(),
+  taxNumber: text("tax_number"), // NIF/VAT number
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  postalCode: text("postal_code"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
 // Insert schemas with validation
 export const insertBrandSchema = createInsertSchema(brands).omit({
   id: true,
@@ -142,8 +156,20 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
 export const insertServiceProviderReviewSchema = createInsertSchema(serviceProviderReviews).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertClientProfileSchema = createInsertSchema(clientProfile).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 }).extend({
-  rating: z.number().min(1).max(5),
+  fullName: z.string().min(2, "Nome completo obrigatório"),
+  email: z.string().email("Email inválido"),
+  phoneNumber: z.string().min(9, "Número de contacto inválido"),
+  taxNumber: z.string().optional(),
+  address: z.string().min(5, "Morada obrigatória"),
+  city: z.string().min(2, "Cidade obrigatória"),
+  postalCode: z.string().optional(),
 });
 
 // Types
@@ -169,6 +195,9 @@ export type InsertServiceProviderReview = z.infer<typeof insertServiceProviderRe
 export type Notification = typeof notifications.$inferSelect;
 
 export type Favorite = typeof favorites.$inferSelect;
+
+export type ClientProfile = typeof clientProfile.$inferSelect;
+export type InsertClientProfile = z.infer<typeof insertClientProfileSchema>;
 
 // Extended types with relations
 export type ProductWithBrand = Product & { brand: Brand };
