@@ -210,13 +210,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Parse product data from form with file URLs
+        const purchaseDate = new Date(req.body.purchaseDate);
+        const warrantyExpiration = new Date(purchaseDate);
+        warrantyExpiration.setFullYear(warrantyExpiration.getFullYear() + 3);
+        
         const productData = {
           brandId: req.body.brandId,
           name: req.body.name,
           model: req.body.model,
           serialNumber: req.body.serialNumber || null,
           category: req.body.category,
-          purchaseDate: new Date(req.body.purchaseDate),
+          purchaseDate,
+          warrantyExpiration,
           store: req.body.store || null,
           notes: req.body.notes || null,
           receiptUrl,
