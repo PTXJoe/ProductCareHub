@@ -224,16 +224,16 @@ export default function ClientProfile() {
                             <SelectValue placeholder="Selecione o país" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="PT">Portugal</SelectItem>
-                            <SelectItem value="ES">Espanha</SelectItem>
-                            <SelectItem value="FR">França</SelectItem>
-                            <SelectItem value="IT">Itália</SelectItem>
-                            <SelectItem value="DE">Alemanha</SelectItem>
-                            <SelectItem value="UK">Reino Unido</SelectItem>
-                            <SelectItem value="NL">Países Baixos</SelectItem>
-                            <SelectItem value="BE">Bélgica</SelectItem>
-                            <SelectItem value="GR">Grécia</SelectItem>
-                            <SelectItem value="PL">Polónia</SelectItem>
+                            <SelectItem value="PT">🇵🇹 Portugal</SelectItem>
+                            <SelectItem value="ES">🇪🇸 Espanha</SelectItem>
+                            <SelectItem value="FR">🇫🇷 França</SelectItem>
+                            <SelectItem value="IT">🇮🇹 Itália</SelectItem>
+                            <SelectItem value="DE">🇩🇪 Alemanha</SelectItem>
+                            <SelectItem value="UK">🇬🇧 Reino Unido</SelectItem>
+                            <SelectItem value="NL">🇳🇱 Países Baixos</SelectItem>
+                            <SelectItem value="BE">🇧🇪 Bélgica</SelectItem>
+                            <SelectItem value="GR">🇬🇷 Grécia</SelectItem>
+                            <SelectItem value="PL">🇵🇱 Polónia</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
