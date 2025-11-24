@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { insertServiceProviderSchema } from "@shared/schema";
-import { Link, useNavigate } from "wouter";
+import { Link, useLocation } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
 
@@ -33,7 +33,7 @@ type ProviderFormValues = z.infer<typeof providerFormSchema>;
 export default function RegisterProvider() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [_, navigate] = useNavigate();
+  const [_, setLocation] = useLocation();
 
   const { data: brands } = useQuery({
     queryKey: ["/api/brands"],
@@ -66,7 +66,7 @@ export default function RegisterProvider() {
         description: "Empresa registada! Aparecerá na lista após verificação.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/service-providers"] });
-      setTimeout(() => navigate("/provedores"), 2000);
+      setTimeout(() => setLocation("/provedores"), 2000);
     },
     onError: (error: any) => {
       toast({
