@@ -210,6 +210,13 @@ export class MemStorage implements IStorage {
         website: "https://www.aeg.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Avenzo",
+        supportEmail: "sat@avenzo.biz",
+        supportPhone: "+351-800-800-800",
+        website: "https://www.avenzo.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
