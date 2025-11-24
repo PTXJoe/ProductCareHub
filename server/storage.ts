@@ -469,6 +469,13 @@ export class MemStorage implements IStorage {
         website: "https://www.ariston.com/pt-pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Whirlpool",
+        supportEmail: "apoio_consumidor@email.whirlpool.com",
+        supportPhone: "+351-707-203-204",
+        website: "https://www.whirlpool.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
