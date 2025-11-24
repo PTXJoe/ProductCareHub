@@ -203,6 +203,13 @@ export class MemStorage implements IStorage {
         website: "https://www.ariston.com/pt-PT/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "AEG",
+        supportEmail: "rma.pt@eletrolux.com",
+        supportPhone: "+351-210-304-261",
+        website: "https://www.aeg.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
