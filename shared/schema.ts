@@ -54,6 +54,40 @@ export const supportRequests = pgTable("support_requests", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+// Service providers table - companies offering repairs/assistance
+export const serviceProviders = pgTable("service_providers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  website: text("website"),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  district: text("district").notNull(), // User's residence zone filter
+  supportedBrands: text("supported_brands").array().default(sql`'{}'::text[]`), // Brand IDs
+  averageRating: integer("average_rating").default(0),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+// Service provider reviews table
+export const serviceProviderReviews = pgTable("service_provider_reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  providerId: varchar("provider_id").notNull().references(() => serviceProviders.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(), // 1-5 stars
+  comment: text("comment"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+// Notifications table for warranty expiration reminders
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // 90days, 60days, 30days, expired
+  sent: boolean("sent").default(false),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 // Insert schemas with validation
 export const insertBrandSchema = createInsertSchema(brands).omit({
   id: true,
@@ -80,6 +114,21 @@ export const insertSupportRequestSchema = createInsertSchema(supportRequests).om
   createdAt: true,
   emailSentAt: true,
   status: true,
+});
+
+export const insertServiceProviderSchema = createInsertSchema(serviceProviders).omit({
+  id: true,
+  createdAt: true,
+  averageRating: true,
+}).extend({
+  supportedBrands: z.array(z.string()).optional(),
+});
+
+export const insertServiceProviderReviewSchema = createInsertSchema(serviceProviderReviews).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  rating: z.number().min(1).max(5),
 });
 
 // Types
