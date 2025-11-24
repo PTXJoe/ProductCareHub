@@ -294,6 +294,13 @@ export class MemStorage implements IStorage {
         website: "https://www.crown.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Celly",
+        supportEmail: "devoluciones@esprinet.com",
+        supportPhone: "+351-214-250-150",
+        website: "https://www.celly.pt/",
+        category: "Eletrónicos",
+      },
     ];
 
     brands.forEach((brand) => {
