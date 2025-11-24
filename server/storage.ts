@@ -252,6 +252,13 @@ export class MemStorage implements IStorage {
         website: "https://www.haier.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Confortec",
+        supportEmail: "geral@liana.com.pt",
+        supportPhone: "+351-214-250-400",
+        website: "https://www.confortec.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
