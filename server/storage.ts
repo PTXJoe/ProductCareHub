@@ -238,6 +238,13 @@ export class MemStorage implements IStorage {
         website: "https://www.candy.pt/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Hoover",
+        supportEmail: "service.portugal@candy-hoover.com",
+        supportPhone: "+351-214-250-600",
+        website: "https://www.hoover.pt/",
+        category: "Eletrodomésticos",
+      },
     ];
 
     brands.forEach((brand) => {
