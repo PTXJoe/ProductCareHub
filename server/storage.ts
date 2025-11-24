@@ -343,6 +343,13 @@ export class MemStorage implements IStorage {
         website: "https://www.epson.pt/pt_PT/support",
         category: "Impressoras e Periféricos",
       },
+      {
+        name: "eMachines",
+        supportEmail: "support_pt@emachines.com",
+        supportPhone: "+351-214-156-700",
+        website: "https://www.emachines.com/ec/pt/PT/content/home.html",
+        category: "Computadores",
+      },
     ];
 
     brands.forEach((brand) => {
