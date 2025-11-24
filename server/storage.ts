@@ -350,6 +350,13 @@ export class MemStorage implements IStorage {
         website: "https://www.emachines.com/ec/pt/PT/content/home.html",
         category: "Computadores",
       },
+      {
+        name: "e-star",
+        supportEmail: "estar@atinformatica.pt",
+        supportPhone: "+351-229-059-999",
+        website: "https://www.atinformatica.pt/",
+        category: "Computadores",
+      },
     ];
 
     brands.forEach((brand) => {
