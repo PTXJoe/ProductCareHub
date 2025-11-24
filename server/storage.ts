@@ -448,6 +448,13 @@ export class MemStorage implements IStorage {
         website: "https://www.hitachi.eu/en/",
         category: "Eletrodomésticos",
       },
+      {
+        name: "Insys",
+        supportEmail: "suporte.tecnico@insys.pt",
+        supportPhone: "+351-234-340-880",
+        website: "https://www.insys.pt/",
+        category: "Computadores",
+      },
     ];
 
     brands.forEach((brand) => {
