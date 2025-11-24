@@ -366,23 +366,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send email via Resend
       let emailSent = false;
       try {
-        console.log("Sending email to:", emailContent.to);
+        console.log("[SUPPORT_REQUEST] Sending email to:", emailContent.to);
+        console.log("[SUPPORT_REQUEST] Email subject:", emailContent.subject);
         const resendClient = await getResendClient();
+        console.log("[SUPPORT_REQUEST] Resend client initialized");
+        
         const emailResponse = await resendClient.emails.send({
-          from: "noreply@warrantymanager.pt",
+          from: "onboarding@resend.dev",
           to: emailContent.to,
           subject: emailContent.subject,
-          text: emailContent.body,
+          html: `<pre>${emailContent.body}</pre>`,
         });
         
+        console.log("[SUPPORT_REQUEST] Resend response:", emailResponse);
+        
         if (emailResponse.error) {
-          console.error("Resend error:", emailResponse.error);
+          console.error("[SUPPORT_REQUEST] Resend error:", emailResponse.error);
         } else {
           emailSent = true;
-          console.log("Email sent successfully with ID:", emailResponse.data?.id);
+          console.log("[SUPPORT_REQUEST] Email sent successfully with ID:", emailResponse.data?.id);
         }
       } catch (emailError) {
-        console.error("Failed to send email:", emailError);
+        console.error("[SUPPORT_REQUEST] Failed to send email:", emailError);
       }
 
       // Create support request record
